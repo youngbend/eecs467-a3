@@ -3,8 +3,8 @@ To build the mbot orbslam3 C code add these three lines to the CMakeLists.txt wi
 other executable definitions in the ORB-SLAM3 directory.
 
 ```
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/mbot)
-add_executable(mono_mbot mbot/mono_mbot.cc)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/eecs467-a3)
+add_executable(mono_mbot eecs467-a3/mono_mbot.cc)
 target_link_libraries(mono_mbot ${PROJECT_NAME})
 ```
 
