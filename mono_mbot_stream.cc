@@ -40,7 +40,8 @@ private:
 public:
 	Handler(const char* vocab_path, const char* settings_path) : SLAM(vocab_path, settings_path, ORB_SLAM3::System::MONOCULAR, true) {}
 	void handleMessage(const lcm::ReceiveBuffer* rbuf, const std::string &chan, const image_t* msg) {
-		cv::Mat im((int)msg->height, (int)msg->width, CV_8UC1, (void*)msg->data.data());
+		cv::Mat data_mat(msg->data, true);
+		cv::Mat im(cv::imdecode(data_mat,0));
 		SLAM.TrackMonocular(im, (double)msg->utime / 1.0e9);
 	}
 

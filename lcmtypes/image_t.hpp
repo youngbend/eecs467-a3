@@ -17,12 +17,6 @@ class image_t
     public:
         int64_t    utime;
 
-        int32_t    width;
-
-        int32_t    height;
-
-        int32_t    pixelformat;
-
         int32_t    size;
 
         std::vector< uint8_t > data;
@@ -126,15 +120,6 @@ int image_t::_encodeNoHash(void *buf, int offset, int maxlen) const
     tlen = __int64_t_encode_array(buf, offset + pos, maxlen - pos, &this->utime, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
-    tlen = __int32_t_encode_array(buf, offset + pos, maxlen - pos, &this->width, 1);
-    if(tlen < 0) return tlen; else pos += tlen;
-
-    tlen = __int32_t_encode_array(buf, offset + pos, maxlen - pos, &this->height, 1);
-    if(tlen < 0) return tlen; else pos += tlen;
-
-    tlen = __int32_t_encode_array(buf, offset + pos, maxlen - pos, &this->pixelformat, 1);
-    if(tlen < 0) return tlen; else pos += tlen;
-
     tlen = __int32_t_encode_array(buf, offset + pos, maxlen - pos, &this->size, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
@@ -151,15 +136,6 @@ int image_t::_decodeNoHash(const void *buf, int offset, int maxlen)
     int pos = 0, tlen;
 
     tlen = __int64_t_decode_array(buf, offset + pos, maxlen - pos, &this->utime, 1);
-    if(tlen < 0) return tlen; else pos += tlen;
-
-    tlen = __int32_t_decode_array(buf, offset + pos, maxlen - pos, &this->width, 1);
-    if(tlen < 0) return tlen; else pos += tlen;
-
-    tlen = __int32_t_decode_array(buf, offset + pos, maxlen - pos, &this->height, 1);
-    if(tlen < 0) return tlen; else pos += tlen;
-
-    tlen = __int32_t_decode_array(buf, offset + pos, maxlen - pos, &this->pixelformat, 1);
     if(tlen < 0) return tlen; else pos += tlen;
 
     tlen = __int32_t_decode_array(buf, offset + pos, maxlen - pos, &this->size, 1);
@@ -179,16 +155,13 @@ int image_t::_getEncodedSizeNoHash() const
     int enc_size = 0;
     enc_size += __int64_t_encoded_array_size(NULL, 1);
     enc_size += __int32_t_encoded_array_size(NULL, 1);
-    enc_size += __int32_t_encoded_array_size(NULL, 1);
-    enc_size += __int32_t_encoded_array_size(NULL, 1);
-    enc_size += __int32_t_encoded_array_size(NULL, 1);
     enc_size += __byte_encoded_array_size(NULL, this->size);
     return enc_size;
 }
 
 uint64_t image_t::_computeHash(const __lcm_hash_ptr *)
 {
-    uint64_t hash = 0xf0f6fc49e18a4f98LL;
+    uint64_t hash = 0x6622163ed1a7984dLL;
     return (hash<<1) + ((hash>>63)&1);
 }
 
