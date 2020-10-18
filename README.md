@@ -3,9 +3,14 @@ To build the mbot orbslam3 C code add these three lines to the CMakeLists.txt wi
 other executable definitions in the ORB-SLAM3 directory.
 
 ```
+find_package(lcm REQUIRED)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/eecs467-a3)
+
 add_executable(mono_mbot eecs467-a3/mono_mbot.cc)
 target_link_libraries(mono_mbot ${PROJECT_NAME})
+
+add_executable(mono_mbot_stream eecs467-a3/mono_mbot_stream.cc)
+target_link_libraries(mono_mbot_stream ${PROJECT_NAME} lcm)
 ```
 
 To create a dataset from a video, run the code:
