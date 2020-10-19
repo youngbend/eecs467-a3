@@ -29,27 +29,40 @@
 
 #include <lcm/lcm-cpp.hpp>
 #include "lcmtypes/image_t.hpp"
+#include "lcmtypes/mbot_imu_t.hpp"
 
 using namespace std;
 
+vector<ORB_SLAM3::IMU::Point> IMU_Data;
 double start_time;
 
-class Handler {
+class Image_Handler {
 
 private:
 	ORB_SLAM3::System SLAM;
 		
 public:
-	Handler(const char* vocab_path, const char* settings_path) : SLAM(vocab_path, settings_path, ORB_SLAM3::System::MONOCULAR, true) {}
+	Image_Handler(const char* vocab_path, const char* settings_path) : SLAM(vocab_path, settings_path, ORB_SLAM3::System::MONOCULAR, true) {}
 	void handleMessage(const lcm::ReceiveBuffer* rbuf, const std::string &chan, const image_t* msg) {
 		if (start_time == -1) start_time = (double)msg->utime / 1.0e9;
 		cv::Mat data_mat(msg->data, true);
 		cv::Mat im(cv::imdecode(data_mat,0));
-		SLAM.TrackMonocular(im, (double)msg->utime / 1.0e9 - start_time);
+		SLAM.TrackMonocular(im, (double)msg->utime / 1.0e9 - start_time, IMU_Data);
+		IMU_Data.clear();
 	}
 
-	~Handler() {
+	~Image_Handler() {
 		SLAM.Shutdown();
+	}
+};
+
+class IMU_Handler {
+
+public:
+	~IMU_Handler() {}
+	void handleMessage(const lcm::ReceiveBuffer* rbuf, const std::string &chan, const mbot_imu_t* msg) {
+		if (start_time == -1) start_time = (double)msg->utime / 1.0e9;
+		IMU_Data.push_back(ORB_SLAM3::IMU::Point(msg->accel[0], msg->accel[1], msg->accel[2], msg->gyro[0], msg->gyro[1], msg->gyro[2], (double)msg->utime / 1.0e9 - start_time));
 	}
 };
 
@@ -68,10 +81,11 @@ int main(int argc, char **argv)
     }
 
     start_time = -1;
+    Image_Handler imhandle(argv[1],argv[2]);
+    IMU_Handler imuhandle;
 
-    Handler handle(argv[1],argv[2]);
-
-	lcm.subscribe("MBOT_IMAGE_STREAM", &Handler::handleMessage, &handle);
+	lcm.subscribe("MBOT_IMAGE_STREAM", &Image_Handler::handleMessage, &imhandle);
+	lcm.subscribe("MBOT_IMU", &IMU_Handler::handleMessage, &imuhandle);
 
 	while(lcm.handle() == 0);
 
